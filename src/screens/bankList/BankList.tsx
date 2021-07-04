@@ -8,8 +8,12 @@ import {
 import { ROUTES } from "../../constants/routes/Routes";
 import { BankDto } from "../../models/Dto/BankDto";
 import { StyledBankList } from "./styles";
+import ReactPaginate from "react-paginate";
 
 interface Props {
+  setPerPage: React.Dispatch<React.SetStateAction<number>>;
+  handlePageClick: any;
+  pageCount: number;
   banks: BankDto[];
   filterDataBasisOnSelectedCategory: (
     value: string,
@@ -18,7 +22,10 @@ interface Props {
   setCity: React.Dispatch<React.SetStateAction<City>>;
 }
 
-export default function BankList({
+function BankList({
+  setPerPage,
+  handlePageClick,
+  pageCount,
   banks,
   setCity,
   filterDataBasisOnSelectedCategory,
@@ -35,6 +42,10 @@ export default function BankList({
 
   const handleCityChange = (e: any) => {
     setCity(e.target.value as City);
+  };
+
+  const handlePerPageChange = (e: any) => {
+    setPerPage(parseInt(e.target.value));
   };
 
   return (
@@ -85,7 +96,32 @@ export default function BankList({
           ))}
         </table>
       </div>
-      <div className="pagination-container">pages</div>
+      <div className="pagination-container">
+        <div className="page-count-container">
+          <span>page count: </span>
+          <select onChange={handlePerPageChange}>
+            <option selected={true} value="10">
+              10
+            </option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select>
+        </div>
+        <ReactPaginate
+          previousLabel={"prev"}
+          nextLabel={"next"}
+          breakLabel={"..."}
+          breakClassName={"break-me"}
+          pageCount={pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+        />
+      </div>
     </StyledBankList>
   );
 }
+
+export default React.memo(BankList);

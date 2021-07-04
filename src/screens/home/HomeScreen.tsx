@@ -10,25 +10,40 @@ import BankList from "../bankList/BankList";
 import BankDetails from "../bankDetails/BankDetails";
 import { StyledHomeScreen } from "./styles";
 import FavoriteBanks from "../favouriteBanks/FavoriteBanks";
+import ErrorBoundary from "../../components/error/ErrorBoundary";
+import LoaderHOC from "../../components/loader";
 
-interface Props {}
+interface Props {
+  setLoading: Function;
+}
 
-export default function HomeScreen({}: Props): ReactElement {
+function HomeScreen({ setLoading }: Props): ReactElement {
+  const [offset, setOffset] = useState(0);
+  const [perPage, setPerPage] = useState(10);
+  const [pageCount, setPageCount] = useState(0);
   const [city, setCity] = useState(City.MUMBAI);
   const [banks, setBanks] = useState<BankDto[]>([]);
   const [filteredBankList, setFilteredBankList] = useState<BankDto[]>([]);
+  const [currentBankList, setCurrentBankList] = useState<BankDto[]>([]);
+
+  const handlePageClick = (e: { selected: any }) => {
+    const selectedPage = e.selected;
+    setOffset(selectedPage + 1);
+  };
 
   const filterDataBasisOnSelectedCategory = (
     value: string,
     category: Category | undefined
   ) => {
+    console.log(value, category);
     if (!category || !value) {
       setFilteredBankList(banks);
       return;
     }
     setFilteredBankList(
       banks.filter((bank) => {
-        if (category) return bank[category].includes(value);
+        // if (category)
+        return bank[category].toLowerCase().includes(value.toLowerCase());
       })
     );
   };
@@ -39,13 +54,21 @@ export default function HomeScreen({}: Props): ReactElement {
   );
 
   useEffect(() => {
+    const slicedList = filteredBankList.slice(offset, offset + perPage);
+    setCurrentBankList(slicedList);
+    setPageCount(Math.ceil(filteredBankList.length / perPage));
+  }, [filteredBankList, offset, perPage]);
+
+  useEffect(() => {
+    setLoading(true);
     getBanksByCity(city)
       .then((data) => {
         setBanks(data);
         setFilteredBankList(data);
+        setLoading(false);
       })
       .catch((err) => {
-        throw new Error(err);
+        //log error here
       });
   }, [city]);
 
@@ -57,13 +80,18 @@ export default function HomeScreen({}: Props): ReactElement {
       <div className="bank-details-container">
         <Switch>
           <Route exact path={ROUTES.ALL_BANKS}>
-            <BankList
-              filterDataBasisOnSelectedCategory={
-                debouncedFilterDataBasisOnSelectedCategory
-              }
-              setCity={setCity}
-              banks={filteredBankList}
-            />
+            <ErrorBoundary>
+              <BankList
+                handlePageClick={handlePageClick}
+                filterDataBasisOnSelectedCategory={
+                  debouncedFilterDataBasisOnSelectedCategory
+                }
+                pageCount={pageCount}
+                setPerPage={setPerPage}
+                setCity={setCity}
+                banks={currentBankList}
+              />
+            </ErrorBoundary>
           </Route>
           <Route exact path={ROUTES.BANK_DETAILS}>
             <BankDetails banks={banks} />
@@ -79,3 +107,5 @@ export default function HomeScreen({}: Props): ReactElement {
     </StyledHomeScreen>
   );
 }
+
+export default LoaderHOC(HomeScreen, "Please wait we load the data");

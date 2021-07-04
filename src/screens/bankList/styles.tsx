@@ -19,7 +19,7 @@ export const StyledBankList = styled.div`
   .bank-list-container {
     padding: 1vh 0;
     overflow-y: scroll;
-    height: 85%;
+    height: 80%;
     .bank-table-container {
       border-collapse: collapse;
       width: 100%;
@@ -46,7 +46,51 @@ export const StyledBankList = styled.div`
   .pagination-container {
     display: flex;
     align-items: center;
-    align-self: flex-end;
-    height: 5%;
+    justify-content: space-between;
+    height: 10%;
+    .page-count-container {
+      span {
+        margin: 0 10px;
+      }
+      select {
+        padding: 5px;
+      }
+    }
+    .pagination {
+      display: flex;
+      list-style: none;
+      outline: none;
+    }
+    .pagination > .active > a {
+      background-color: #092a49;
+      border-color: #092a49;
+      color: #fff;
+    }
+    .pagination > li > a {
+      border: 1px solid #092a49;
+      padding: 5px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .pagination > .active > a,
+    .pagination > .active > span,
+    .pagination > .active > a:hover,
+    .pagination > .active > span:hover,
+    .pagination > .active > a:focus,
+    .pagination > .active > span:focus {
+      background-color: #092a49;
+      border-color: #092a49;
+      outline: none;
+    }
+    .pagination > li > a,
+    .pagination > li > span {
+      color: #092a49;
+    }
+    .pagination > li:first-child > a,
+    .pagination > li:first-child > span,
+    .pagination > li:last-child > a,
+    .pagination > li:last-child > span {
+      border-radius: unset;
+    }
   }
 `;
