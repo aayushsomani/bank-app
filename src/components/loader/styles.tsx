@@ -10,8 +10,8 @@ export const StyledLoader = styled.div`
     background: #f8f8f8ad;
   }
   .fp-container .fp-loader {
-    top: calc(50% - 35px);
-    left: 55%;
+    top: calc(50%);
+    left: 50%;
     z-index: 1000;
     position: absolute;
   }

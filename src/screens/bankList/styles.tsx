@@ -15,6 +15,12 @@ export const StyledBankList = styled.div`
     justify-content: space-between;
     align-items: center;
     height: 10%;
+    input {
+      padding: 5px 5px;
+      margin: 0 5px;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
   }
   .bank-list-container {
     padding: 1vh 0;

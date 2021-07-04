@@ -1,8 +1,12 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Link, Route, Switch } from "react-router-dom";
 import { getBanksByCity } from "../../api/BankApis";
 import SideBar from "../../components/sideBar/SideBar";
-import { Category, City } from "../../constants/contents/BankContents";
+import {
+  BANK_CONTENTS,
+  Category,
+  City,
+} from "../../constants/contents/BankContents";
 import { ROUTES } from "../../constants/routes/Routes";
 import { BankDto } from "../../models/Dto/BankDto";
 import { debounce } from "../../utils/HelperFunctions";
@@ -10,7 +14,6 @@ import BankList from "../bankList/BankList";
 import BankDetails from "../bankDetails/BankDetails";
 import { StyledHomeScreen } from "./styles";
 import FavoriteBanks from "../favouriteBanks/FavoriteBanks";
-import ErrorBoundary from "../../components/error/ErrorBoundary";
 import LoaderHOC from "../../components/loader";
 
 interface Props {
@@ -26,39 +29,42 @@ function HomeScreen({ setLoading }: Props): ReactElement {
   const [filteredBankList, setFilteredBankList] = useState<BankDto[]>([]);
   const [currentBankList, setCurrentBankList] = useState<BankDto[]>([]);
 
+  // handler for changing page to selected one
   const handlePageClick = (e: { selected: any }) => {
     const selectedPage = e.selected;
     setOffset(selectedPage + 1);
   };
 
+  // filter bank list basis on category provided
   const filterDataBasisOnSelectedCategory = (
     value: string,
     category: Category | undefined
   ) => {
-    console.log(value, category);
     if (!category || !value) {
       setFilteredBankList(banks);
       return;
     }
     setFilteredBankList(
       banks.filter((bank) => {
-        // if (category)
-        return bank[category].toLowerCase().includes(value.toLowerCase());
+        return bank[category].toLowerCase().indexOf(value.toLowerCase()) !== -1;
       })
     );
   };
 
+  // return debounced function for filtering data basis on selected category and value provided
   const debouncedFilterDataBasisOnSelectedCategory = debounce(
     filterDataBasisOnSelectedCategory,
     500
   );
 
+  // sets current bank list which is used to render in bank list component after slicing according to pre page count
   useEffect(() => {
     const slicedList = filteredBankList.slice(offset, offset + perPage);
     setCurrentBankList(slicedList);
     setPageCount(Math.ceil(filteredBankList.length / perPage));
   }, [filteredBankList, offset, perPage]);
 
+  // api call to get bank details, invokes each time when value of city changes
   useEffect(() => {
     setLoading(true);
     getBanksByCity(city)
@@ -80,27 +86,28 @@ function HomeScreen({ setLoading }: Props): ReactElement {
       <div className="bank-details-container">
         <Switch>
           <Route exact path={ROUTES.ALL_BANKS}>
-            <ErrorBoundary>
-              <BankList
-                handlePageClick={handlePageClick}
-                filterDataBasisOnSelectedCategory={
-                  debouncedFilterDataBasisOnSelectedCategory
-                }
-                pageCount={pageCount}
-                setPerPage={setPerPage}
-                setCity={setCity}
-                banks={currentBankList}
-              />
-            </ErrorBoundary>
+            <BankList
+              perPage={perPage}
+              city={city}
+              handlePageClick={handlePageClick}
+              filterDataBasisOnSelectedCategory={
+                debouncedFilterDataBasisOnSelectedCategory
+              }
+              pageCount={pageCount}
+              setPerPage={setPerPage}
+              setCity={setCity}
+              banks={currentBankList}
+            />
           </Route>
           <Route exact path={ROUTES.BANK_DETAILS}>
             <BankDetails banks={banks} />
           </Route>
           <Route exact path={ROUTES.FAVORITE_BANKS}>
-            <FavoriteBanks banks={filteredBankList} />
+            <FavoriteBanks banks={currentBankList} />
           </Route>
-          <Route path={"/"}>
-            <h1>NOT FOUND</h1>
+          <Route>
+            <h1>{BANK_CONTENTS.PAGE_NOT_FOUND}</h1>
+            <Link to={ROUTES.ALL_BANKS}>{BANK_CONTENTS.GO_TO_HOME_PAGE}</Link>
           </Route>
         </Switch>
       </div>
@@ -108,4 +115,4 @@ function HomeScreen({ setLoading }: Props): ReactElement {
   );
 }
 
-export default LoaderHOC(HomeScreen, "Please wait we load the data");
+export default LoaderHOC(HomeScreen);

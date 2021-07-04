@@ -7,6 +7,7 @@ interface Props {
   banks: BankDto[];
 }
 
+// renders list favorite bank from local storage
 export default function FavoriteBanks({ banks }: Props): ReactElement {
   return (
     <StyledFavoriteBanks>
@@ -16,20 +17,22 @@ export default function FavoriteBanks({ banks }: Props): ReactElement {
       </div>
       <div className="bank-list-container">
         <table className="bank-table-container">
-          <tr>
-            <th>BANK</th>
-            <th>IFSC</th>
-            <th>BRANCH</th>
-            <th>DISTRICT</th>
-          </tr>
-          {banks.map((bank) => (
+          <tbody>
             <tr>
-              <td>{bank.bank_name}</td>
-              <td>{bank.ifsc}</td>
-              <td>{bank.branch}</td>
-              <td>{bank.district}</td>
+              <th>{BANK_CONTENTS.TABLE_HEADING.BANK}</th>
+              <th>{BANK_CONTENTS.TABLE_HEADING.IFSC}</th>
+              <th>{BANK_CONTENTS.TABLE_HEADING.BRANCH}</th>
+              <th>{BANK_CONTENTS.TABLE_HEADING.DISTRICT}</th>
             </tr>
-          ))}
+            {banks.map((bank, k) => (
+              <tr key={k}>
+                <td>{bank.bank_name}</td>
+                <td>{bank.ifsc}</td>
+                <td>{bank.branch}</td>
+                <td>{bank.district}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </StyledFavoriteBanks>

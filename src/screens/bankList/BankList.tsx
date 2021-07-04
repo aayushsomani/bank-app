@@ -9,9 +9,12 @@ import { ROUTES } from "../../constants/routes/Routes";
 import { BankDto } from "../../models/Dto/BankDto";
 import { StyledBankList } from "./styles";
 import ReactPaginate from "react-paginate";
+import SelectBox from "../../components/selectbox/SelectBox";
 
 interface Props {
+  perPage: number;
   setPerPage: React.Dispatch<React.SetStateAction<number>>;
+  city: City;
   handlePageClick: any;
   pageCount: number;
   banks: BankDto[];
@@ -22,8 +25,11 @@ interface Props {
   setCity: React.Dispatch<React.SetStateAction<City>>;
 }
 
+// renders list of banks
 function BankList({
+  perPage,
   setPerPage,
+  city,
   handlePageClick,
   pageCount,
   banks,
@@ -32,18 +38,22 @@ function BankList({
 }: Props): ReactElement {
   const [selectedCategory, setSelectedCategory] = useState<Category>();
 
+  // handler for search input change
   const handleInputChange = (e: { target: { value: string } }) => {
     filterDataBasisOnSelectedCategory(e.target.value, selectedCategory);
   };
 
+  //handler for category change
   const handleCategoryChange = (e: any) => {
     setSelectedCategory(e.target.value as Category);
   };
 
+  //handler for city change
   const handleCityChange = (e: any) => {
     setCity(e.target.value as City);
   };
 
+  //handler for page change
   const handlePerPageChange = (e: any) => {
     setPerPage(parseInt(e.target.value));
   };
@@ -53,59 +63,64 @@ function BankList({
       <div className="bank-query-container">
         <div>{BANK_CONTENTS.ALL_BANK}</div>
         <div>
-          <select onChange={handleCityChange}>
-            <option value={City.MUMBAI}>{City.MUMBAI}</option>
-            <option value={City.BANGALORE}>{City.BANGALORE}</option>
-            <option value={City.LUCKNOW}>{City.LUCKNOW}</option>
-          </select>
-          <select onChange={handleCategoryChange} value={selectedCategory}>
-            <option value={""}>{"SELECT "}</option>
-            <option value={Category.BANK_NAME}>{Category.BANK_NAME}</option>
-            <option value={Category.BRANCH}>{Category.BRANCH}</option>
-            <option value={Category.IFSC}>{Category.IFSC}</option>
-          </select>
-          <input onChange={handleInputChange} />
+          <SelectBox
+            options={BANK_CONTENTS.CITY_OPTIONS}
+            value={city}
+            onChange={handleCityChange}
+          />
+          <SelectBox
+            options={BANK_CONTENTS.CATEGORY_OPTIONS}
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          />
+          <input
+            placeholder={BANK_CONTENTS.SEARCH_PLACEHOLDER}
+            onChange={handleInputChange}
+          />
         </div>
       </div>
       <div className="bank-list-container">
-        <table className="bank-table-container">
-          <tr>
-            <th>BANK</th>
-            <th>IFSC</th>
-            <th>BRANCH</th>
-            <th>DISTRICT</th>
-            <th>VIEW MORE</th>
-          </tr>
-          {banks.map((bank) => (
-            <tr>
-              <td>{bank.bank_name}</td>
-              <td>{bank.ifsc}</td>
-              <td>{bank.branch}</td>
-              <td>{bank.district}</td>
-              <td>
-                <Link
-                  to={{
-                    pathname: `${ROUTES.BANK_DETAIL}/${bank.ifsc}`,
-                    state: bank,
-                  }}
-                >
-                  View
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </table>
+        {banks.length !== 0 ? (
+          <table className="bank-table-container">
+            <tbody>
+              <tr>
+                <th>{BANK_CONTENTS.TABLE_HEADING.BANK}</th>
+                <th>{BANK_CONTENTS.TABLE_HEADING.IFSC}</th>
+                <th>{BANK_CONTENTS.TABLE_HEADING.BRANCH}</th>
+                <th>{BANK_CONTENTS.TABLE_HEADING.DISTRICT}</th>
+                <th>{BANK_CONTENTS.TABLE_HEADING.VIEW_MORE}</th>
+              </tr>
+              {banks.map((bank, k) => (
+                <tr key={k}>
+                  <td>{bank.bank_name}</td>
+                  <td>{bank.ifsc}</td>
+                  <td>{bank.branch}</td>
+                  <td>{bank.district}</td>
+                  <td>
+                    <Link
+                      to={{
+                        pathname: `${ROUTES.BANK_DETAIL}/${bank.ifsc}`,
+                        state: bank,
+                      }}
+                    >
+                      {BANK_CONTENTS.VIEW_MORE}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <h1>{BANK_CONTENTS.NOT_FOUND}</h1>
+        )}
       </div>
       <div className="pagination-container">
         <div className="page-count-container">
-          <span>page count: </span>
-          <select onChange={handlePerPageChange}>
-            <option selected={true} value="10">
-              10
-            </option>
-            <option value="20">20</option>
-            <option value="30">30</option>
-          </select>
+          <span>{BANK_CONTENTS.PAGE_COUNT_TEXT}</span>
+          <SelectBox
+            options={BANK_CONTENTS.PAGE_COUNTS}
+            onChange={handlePerPageChange}
+          />
         </div>
         <ReactPaginate
           previousLabel={"prev"}

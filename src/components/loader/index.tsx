@@ -1,7 +1,7 @@
-import React, { ReactElement, useState } from "react";
+import React, { useState } from "react";
 import { StyledLoader } from "./styles";
 
-function LoaderHOC(WrappedComponent: any, loadingMessage: string): any {
+function LoaderHOC(WrappedComponent: any): any {
   function HOC(props: any): any {
     const [isLoading, setLoading] = useState(true);
     const setLoadingState = (isComponentLoading: boolean) => {

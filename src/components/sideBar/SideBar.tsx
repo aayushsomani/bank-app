@@ -10,6 +10,7 @@ function SideBar({}: Props): ReactElement {
   const [currentPath, setCurrentPath] = useState("/");
   const location = useLocation();
 
+  // runs every time when url changes, used to highlight selected menu
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location]);
