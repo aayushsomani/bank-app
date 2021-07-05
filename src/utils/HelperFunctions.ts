@@ -44,3 +44,19 @@ export function getItemFromLocalStorageWithExpiry(key: string) {
     }
     return item.value
 }
+
+export function getItemFromLocalStorage(key: string) {
+    const itemStr = localStorage.getItem(key)
+    // if the item doesn't exist, return null
+    if (!itemStr) {
+        return null
+    }
+    const item = JSON.parse(itemStr)
+    return item;
+}
+
+export function setItemInLocalStorage(key: string, value: any) {
+    // `item` is an object which contains the original value
+    // as well as the time when it's supposed to expire
+    localStorage.setItem(key, JSON.stringify(value));
+}

@@ -4,11 +4,15 @@ import { BankDto } from "../../models/Dto/BankDto";
 import { StyledFavoriteBanks } from "./styles";
 
 interface Props {
-  banks: BankDto[];
+  removeFromFavorite: (bank: BankDto) => void;
+  favoriteBanks: BankDto[];
 }
 
 // renders list favorite bank from local storage
-export default function FavoriteBanks({ banks }: Props): ReactElement {
+export default function FavoriteBanks({
+  favoriteBanks,
+  removeFromFavorite,
+}: Props): ReactElement {
   return (
     <StyledFavoriteBanks>
       <div className="bank-query-container">
@@ -23,13 +27,23 @@ export default function FavoriteBanks({ banks }: Props): ReactElement {
               <th>{BANK_CONTENTS.TABLE_HEADING.IFSC}</th>
               <th>{BANK_CONTENTS.TABLE_HEADING.BRANCH}</th>
               <th>{BANK_CONTENTS.TABLE_HEADING.DISTRICT}</th>
+              <th>{BANK_CONTENTS.TABLE_HEADING.FAVORITE}</th>
             </tr>
-            {banks.map((bank, k) => (
+            {favoriteBanks.map((bank, k) => (
               <tr key={k}>
                 <td>{bank.bank_name}</td>
                 <td>{bank.ifsc}</td>
                 <td>{bank.branch}</td>
                 <td>{bank.district}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      removeFromFavorite(bank);
+                    }}
+                  >
+                    {BANK_CONTENTS.UN_MARK_AS_FAV}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

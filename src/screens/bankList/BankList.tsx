@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   BANK_CONTENTS,
@@ -10,8 +10,14 @@ import { BankDto } from "../../models/Dto/BankDto";
 import { StyledBankList } from "./styles";
 import ReactPaginate from "react-paginate";
 import SelectBox from "../../components/selectbox/SelectBox";
+import {
+  getFavoriteBanksFromLocal,
+  setFavoriteBankInLocal,
+} from "../../api/FavouriteBankApis";
 
 interface Props {
+  addIntoFavorite: (bank: BankDto) => void;
+  favoriteBanks: BankDto[];
   perPage: number;
   setPerPage: React.Dispatch<React.SetStateAction<number>>;
   city: City;
@@ -27,6 +33,8 @@ interface Props {
 
 // renders list of banks
 function BankList({
+  addIntoFavorite,
+  favoriteBanks,
   perPage,
   setPerPage,
   city,
@@ -37,6 +45,7 @@ function BankList({
   filterDataBasisOnSelectedCategory,
 }: Props): ReactElement {
   const [selectedCategory, setSelectedCategory] = useState<Category>();
+  const [filteredBanks, setFilteredBanks] = useState<BankDto[]>([]);
 
   // handler for search input change
   const handleInputChange = (e: { target: { value: string } }) => {
@@ -57,6 +66,18 @@ function BankList({
   const handlePerPageChange = (e: any) => {
     setPerPage(parseInt(e.target.value));
   };
+
+  useEffect(() => {
+    let favoriteBanksMap = new Set(
+      favoriteBanks.map((favBank) => favBank.ifsc)
+    );
+    let vFilteredBanks = banks.map((vBank) => {
+      if (favoriteBanksMap.has(vBank.ifsc)) vBank.isFavorite = true;
+      else vBank.isFavorite = false;
+      return vBank;
+    });
+    setFilteredBanks(vFilteredBanks);
+  }, [favoriteBanks, banks]);
 
   return (
     <StyledBankList>
@@ -89,25 +110,40 @@ function BankList({
                 <th>{BANK_CONTENTS.TABLE_HEADING.BRANCH}</th>
                 <th>{BANK_CONTENTS.TABLE_HEADING.DISTRICT}</th>
                 <th>{BANK_CONTENTS.TABLE_HEADING.VIEW_MORE}</th>
+                <th>{BANK_CONTENTS.TABLE_HEADING.FAVORITE}</th>
               </tr>
-              {banks.map((bank, k) => (
-                <tr key={k}>
-                  <td>{bank.bank_name}</td>
-                  <td>{bank.ifsc}</td>
-                  <td>{bank.branch}</td>
-                  <td>{bank.district}</td>
-                  <td>
-                    <Link
-                      to={{
-                        pathname: `${ROUTES.BANK_DETAIL}/${bank.ifsc}`,
-                        state: bank,
-                      }}
-                    >
-                      {BANK_CONTENTS.VIEW_MORE}
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {filteredBanks.map((bank, k) => {
+                return (
+                  <tr key={k}>
+                    <td>{bank.bank_name}</td>
+                    <td>{bank.ifsc}</td>
+                    <td>{bank.branch}</td>
+                    <td>{bank.district}</td>
+                    <td>
+                      <Link
+                        to={{
+                          pathname: `${ROUTES.BANK_DETAIL}/${bank.ifsc}`,
+                          state: bank,
+                        }}
+                      >
+                        {BANK_CONTENTS.VIEW_MORE}
+                      </Link>
+                    </td>
+                    <td>
+                      <button
+                        disabled={bank.isFavorite}
+                        onClick={() => {
+                          addIntoFavorite(bank);
+                        }}
+                      >
+                        {bank.isFavorite
+                          ? BANK_CONTENTS.MARKED_AS_FAV
+                          : BANK_CONTENTS.MARK_AS_FAV}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

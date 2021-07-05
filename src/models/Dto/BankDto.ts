@@ -17,4 +17,5 @@ export class BankDto {
     district: string;
     state: string;
     bank_name: string;
+    isFavorite?: boolean;
 }

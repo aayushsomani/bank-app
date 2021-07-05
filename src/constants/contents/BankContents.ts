@@ -47,7 +47,13 @@ export const BANK_CONTENTS = {
         ADDRESS: "ADDRESS",
         IFSC: "IFSC",
         BRANCH: "BRANCH",
-        VIEW_MORE: "VIEW MORE"
+        VIEW_MORE: "VIEW MORE",
+        FAVORITE: "FAVORITE",
     },
-    VIEW_MORE: "VIEW MORE"
+    VIEW_MORE: "VIEW MORE",
+    MARK_AS_FAV: "MARK AS FAV",
+    UN_MARK_AS_FAV: "UN MARK",
+    MARKED_AS_FAV: "MARKED AS FAV",
 }
+
+export const FAVORITE_BANKS_KEY = "favorite_banks"
